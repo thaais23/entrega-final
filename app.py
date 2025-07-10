@@ -136,53 +136,36 @@ elif opcion == "🔍 Filtrar por año":
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
 # Mini juego reorganizado y sin errores
-elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
-    st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
-
-    if "puntos" not in st.session_state:
-        st.session_state.puntos = 0
-    if "ronda" not in st.session_state:
-        st.session_state.ronda = 1
-    if "drama_actual" not in st.session_state:
-        st.session_state.drama_actual = None
-    if "respuesta_usuario" not in st.session_state:
-        st.session_state.respuesta_usuario = ""
-    if "mostrar_resultado" not in st.session_state:
-        st.session_state.mostrar_resultado = False
-
-    if st.session_state.ronda <= 3:
-        st.markdown(f"<h4 style='color:#444;'>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
-
-        if st.session_state.drama_actual is None:
-            muestra = df[['title', 'number_of_episodes']].dropna()
-            if not muestra.empty:
-                drama = muestra.sample(1).iloc[0]
-                titulo = str(drama['title'])
-                real = int(drama['number_of_episodes'])
-                mostrado = real + random.choice([-3, -1, 0, +2, +3])
-                st.session_state.drama_actual = {
-                    "titulo": titulo,
-                    "real": real,
-                    "mostrado": mostrado
-                }
-            else:
-                st.error("No hay datos disponibles para el minijuego.")
-                st.stop()
-
-        datos = st.session_state.drama_actual
-
-        st.markdown(f"""
-            <div style='background-color:#fff3f8; padding:25px; border-radius:12px;'>
-                <p style='font-size:18px; color:#000;'><b>{datos['titulo']}</b> tiene <b>{datos['mostrado']}</b> episodios.</p>
-                <p style='font-size:16px; color:#000;'>¿Crees que es verdadero o falso?</p>
+# Estilo de texto para radio
+        st.markdown("""
+            <div style='padding:10px; margin-top:10px; color:#000; font-weight:600; font-size:16px;'>
+                Selecciona tu respuesta:
             </div>
         """, unsafe_allow_html=True)
 
-        opciones = ["Verdadero", "Falso"]
-        respuesta = st.radio("Selecciona tu respuesta:", opciones, index=None, horizontal=True)
+        respuesta = st.radio(
+            label="",
+            options=["Verdadero", "Falso"],
+            index=None,
+            horizontal=True,
+            label_visibility="collapsed"
+        )
 
         if respuesta:
             st.session_state.respuesta_usuario = respuesta
+            st.markdown("""
+                <style>
+                    div.stButton > button {
+                        background-color: #f8bbd0;
+                        color: #000;
+                        font-weight: bold;
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 10px;
+                    }
+                </style>
+            """, unsafe_allow_html=True)
+
             if st.button("📩 Confirmar respuesta"):
                 correcto = (
                     (respuesta == "Verdadero" and datos['mostrado'] == datos['real']) or
@@ -190,26 +173,35 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
                 )
 
                 if correcto:
-                    st.success("✅ ¡Correcto!")
+                    st.session_state.resultado = f"✅ ¡Correcto! '{datos['titulo']}' tiene {datos['real']} episodios."
                     st.session_state.puntos += 1
                 else:
-                    st.error(f"❌ Incorrecto. Tiene {datos['real']} episodios.")
+                    st.session_state.resultado = f"❌ Incorrecto. '{datos['titulo']}' tiene {datos['real']} episodios."
                 st.session_state.mostrar_resultado = True
 
         if st.session_state.mostrar_resultado:
+            st.markdown(f"""
+                <div style='background-color:#ffeef5; padding:15px; border-radius:10px; margin-top:15px; color:#000; font-size:16px;'>
+                    {st.session_state.resultado}
+                </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown("""
+                <style>
+                    div.stButton > button {
+                        background-color: #f48fb1;
+                        color: #000;
+                        font-weight: bold;
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 10px;
+                        margin-top: 10px;
+                    }
+                </style>
+            """, unsafe_allow_html=True)
+
             if st.button("➡️ Siguiente ronda"):
                 st.session_state.ronda += 1
                 st.session_state.drama_actual = None
                 st.session_state.respuesta_usuario = ""
                 st.session_state.mostrar_resultado = False
-
-    else:
-        st.success(f"🎉 Juego terminado. Tu puntaje fue: {st.session_state.puntos}/3")
-        st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
-
-        if st.button("🔄 Volver a jugar"):
-            st.session_state.ronda = 1
-            st.session_state.puntos = 0
-            st.session_state.drama_actual = None
-            st.session_state.respuesta_usuario = ""
-            st.session_state.mostrar_resultado = False
