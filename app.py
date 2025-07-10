@@ -9,58 +9,47 @@ from collections import Counter
 # 🌼 Configuración general
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# 🎨 Estilos personalizados
+# 🎨 Estilos suaves y claros
 st.markdown("""
     <style>
         html, body, .stApp {
             background-color: #fff0f5;
-            color: #222;
+            color: #222222;
         }
 
         h1, h2, h3, h4 {
             color: #e91e63 !important;
         }
 
-        /* Sidebar gris claro con letras negras */
         section[data-testid="stSidebar"] {
-            background-color: #f0f0f0 !important;
+            background-color: #f7f7f7 !important;
         }
+
         section[data-testid="stSidebar"] * {
             color: #222 !important;
         }
 
-        /* Selector (año) con fondo claro y letra visible */
-        div[data-baseweb="select"] {
-            background-color: #fffafc !important;
-            color: #222 !important;
-        }
-
-        /* Mensaje de éxito (se encontraron títulos...) */
-        .stAlert-success {
-            background-color: #fdecef !important;
-            border-left: 0.5rem solid #f48fb1 !important;
-            color: #222 !important;
-        }
-
-        /* Radio buttons */
-        label[data-baseweb="radio"] {
-            color: #222 !important;
-            background-color: #fffafc !important;
-            padding: 4px 8px;
-            border-radius: 5px;
-        }
-
-        /* Botones */
-        button[kind="primary"] {
-            color: #222 !important;
-            background-color: #ffe0eb !important;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-        }
-
-        .stDataFrame {
+        div[data-baseweb="select"], .stRadio div, .stButton button {
+            color: #222222 !important;
             background-color: #ffffff !important;
+            border-radius: 5px;
+        }
+
+        .stAlert-success {
+            background-color: #fce4ec !important;
+            border-left: 6px solid #f48fb1 !important;
+            color: #222222 !important;
+        }
+
+        button[kind="primary"] {
+            background-color: #ffe4ec !important;
+            color: #222 !important;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+        }
+
+        label[data-baseweb="radio"] {
             color: #222 !important;
         }
     </style>
@@ -70,10 +59,10 @@ st.markdown("""
 df = pd.read_csv("kdrama_DATASET.csv")
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
-# 📷 Imagen decorativa en el sidebar
+# 📷 Imagen decorativa en sidebar
 st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_container_width=True)
 
-# 📋 Menú
+# 📋 Menú principal
 opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🏠 Inicio",
     "📅 Producción por año",
@@ -83,7 +72,7 @@ opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🎮 Mini juego: ¿Verdadero o falso?"
 ])
 
-# 🏠 INICIO
+# 🏠 Página de inicio
 if opcion == "🏠 Inicio":
     st.image("Songjoongkipng.png", use_container_width=True)
     st.markdown("<h1 style='text-align:center;'>Bienvenid@ a tu app de K-dramas ✨</h1>", unsafe_allow_html=True)
