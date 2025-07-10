@@ -32,6 +32,18 @@ st.markdown("""
             padding: 0.5em 1em;
             border: none;
         }
+
+        div.row-widget.stRadio > div {
+            flex-direction: row;
+        }
+        div.row-widget.stRadio label {
+            color: #000000 !important;
+            font-weight: 600;
+            background-color: #fce4ec;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 5px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -113,11 +125,11 @@ elif opcion == "🔍 Filtrar por año":
         st.warning("No se encontraron resultados para este año.")
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# MINI JUEGO FINAL BONITO
+# MINI JUEGO
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
 
-    # Inicializar variables del juego
+    # Inicializar estados
     for clave, valor in {
         "ronda": 1,
         "puntos": 0,
@@ -166,29 +178,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("""
-    <style>
-        div.row-widget.stRadio > div {
-            flex-direction: row;
-        }
-        div.row-widget.stRadio label {
-            color: #000000 !important;
-            font-weight: 600;
-            background-color: #fce4ec;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin: 5px;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
-respuesta = st.radio(
-    "Selecciona tu respuesta",
-    ["Verdadero", "Falso"],
-    index=None,
-    horizontal=True,
-    label_visibility="collapsed"
-)
+        respuesta = st.radio("Selecciona tu respuesta", ["Verdadero", "Falso"], index=None, horizontal=True, label_visibility="collapsed")
 
         if respuesta:
             if st.button("📩 Confirmar respuesta"):
