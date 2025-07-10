@@ -6,10 +6,10 @@ from wordcloud import WordCloud
 import random
 from collections import Counter
 
-# Configuración general
+# 🌼 Configuración general
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# 🎨 CSS Final Mejorado
+# 🎨 Estilos finales corregidos
 st.markdown("""
     <style>
         html, body, .stApp {
@@ -29,12 +29,25 @@ st.markdown("""
             color: #222 !important;
         }
 
-        /* Selectbox real */
+        /* Mensaje de éxito (filtrar por año) */
+        .stAlert-success {
+            background-color: #ffe6ef !important;
+            border-left: 6px solid #f48fb1 !important;
+            color: #222 !important;
+        }
+
+        /* Tabla de resultados */
+        .stDataFrame div {
+            background-color: #f9f9f9 !important;
+            color: #222 !important;
+        }
+
+        /* Selector de año */
         div[data-baseweb="select"] {
             background-color: #ffffff !important;
             color: #222 !important;
+            border: 1px solid #ccc !important;
             border-radius: 6px;
-            border: 1px solid #ccc;
         }
 
         .stSelectbox label {
@@ -42,38 +55,16 @@ st.markdown("""
             font-weight: bold;
         }
 
-        /* Mensaje de éxito: rosado claro */
-        .stAlert-success {
-            background-color: #fce4ec !important;
-            border-left: 6px solid #f48fb1 !important;
-            color: #222 !important;
-        }
-
-        /* Dataframe */
-        .stDataFrame div {
-            background-color: #ffffff !important;
-            color: #222 !important;
-        }
-
-        /* Radios del minijuego */
-        div[data-baseweb="radio"] {
-            color: #222 !important;
-        }
-
+        /* Radios del juego */
         div[data-baseweb="radio"] label {
-            background-color: #fff9fb !important;
+            background-color: #ffeef5 !important;
             color: #222 !important;
             padding: 6px 12px;
             border-radius: 6px;
             font-weight: 500;
         }
 
-        /* Texto general del juego */
-        .stRadio, .stButton {
-            color: #222 !important;
-        }
-
-        /* Botón Responder */
+        /* Botón 'Responder' */
         button[kind="primary"] {
             background-color: #ffe4ec !important;
             color: #222 !important;
@@ -81,15 +72,22 @@ st.markdown("""
             border-radius: 6px;
             padding: 8px 14px;
         }
+
+        /* Texto general de preguntas y markdowns */
+        .stMarkdown, .stRadio label {
+            color: #222 !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# Cargar dataset
+# 📚 Cargar dataset
 df = pd.read_csv("kdrama_DATASET.csv")
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
-# Sidebar
+# 📷 Imagen decorativa en sidebar
 st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_container_width=True)
+
+# 📋 Menú principal
 opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🏠 Inicio",
     "📅 Producción por año",
@@ -99,13 +97,13 @@ opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🎮 Mini juego: ¿Verdadero o falso?"
 ])
 
-# Inicio
+# 🏠 Página de inicio
 if opcion == "🏠 Inicio":
     st.image("Songjoongkipng.png", use_container_width=True)
     st.markdown("<h1 style='text-align:center;'>Bienvenid@ a tu app de K-dramas ✨</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center;'>Analiza, explora y diviértete con los mejores títulos coreanos 💕</p>", unsafe_allow_html=True)
 
-# Producción por año
+# 📅 Producción por año
 elif opcion == "📅 Producción por año":
     st.subheader("📈 Cantidad de K-dramas producidos por año")
     sns.set_style("whitegrid")
@@ -114,7 +112,7 @@ elif opcion == "📅 Producción por año":
     plt.xticks(rotation=45)
     st.pyplot(fig)
 
-# Géneros más comunes
+# 🎭 Géneros más comunes
 elif opcion == "🎭 Géneros más comunes":
     st.subheader("🎬 Top 10 géneros más frecuentes en K-dramas")
     sns.set_style("whitegrid")
@@ -132,7 +130,7 @@ elif opcion == "🎭 Géneros más comunes":
     ax.set_ylabel("Frecuencia")
     st.pyplot(fig)
 
-# Nube de palabras
+# ☁️ Nube de palabras
 elif opcion == "☁️ Nube de palabras en títulos":
     st.subheader("☁️ Palabras más comunes en los títulos de K-dramas")
     textos = " ".join(df['title'].dropna())
@@ -142,7 +140,7 @@ elif opcion == "☁️ Nube de palabras en títulos":
     ax.axis("off")
     st.pyplot(fig)
 
-# Filtrar por año
+# 🔍 Filtrar por año
 elif opcion == "🔍 Filtrar por año":
     st.subheader("📅 Filtrar K-dramas por año de estreno")
     años = sorted(df['year_of_release'].dropna().unique())
@@ -152,7 +150,7 @@ elif opcion == "🔍 Filtrar por año":
     st.dataframe(filtrado[['title', 'genre', 'number_of_episodes']])
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# Minijuego
+# 🎮 Mini juego
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.subheader("🎲 Adivina si el número de episodios es correcto")
     if "puntos" not in st.session_state:
