@@ -143,84 +143,67 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         st.session_state.puntos = 0
     if "ronda" not in st.session_state:
         st.session_state.ronda = 1
-    if "juego_terminado" not in st.session_state:
-        st.session_state.juego_terminado = False
-    if "mostrar_resultado" not in st.session_state:
-        st.session_state.mostrar_resultado = False
-    if "resultado_mensaje" not in st.session_state:
-        st.session_state.resultado_mensaje = ""
-    if "resultado_correcto" not in st.session_state:
-        st.session_state.resultado_correcto = False
+    if "drama_actual" not in st.session_state:
+        st.session_state.drama_actual = None
+    if "resultado" not in st.session_state:
+        st.session_state.resultado = ""
 
-    if st.session_state.ronda <= 3 and not st.session_state.juego_terminado:
-        st.markdown(f"<h4 style='color:#555'>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
+    if st.session_state.ronda <= 3:
+        st.markdown(f"<h4 style='color:#555;'>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
 
-        if "drama_actual" not in st.session_state:
+        if st.session_state.drama_actual is None:
             drama = df[['title', 'number_of_episodes']].dropna().sample(1).iloc[0]
-            alterado = drama['number_of_episodes'] + random.choice([-3, -1, 0, +2, +4])
-            st.session_state.drama_actual = drama
-            st.session_state.episodios_mostrados = alterado
+            alterado = drama['number_of_episodes'] + random.choice([-3, -2, 0, +2, +3])
+            st.session_state.drama_actual = {
+                "titulo": drama['title'],
+                "episodios_reales": drama['number_of_episodes'],
+                "episodios_mostrados": alterado
+            }
+
+        datos = st.session_state.drama_actual
 
         st.markdown(f"""
             <div style='background-color:#fff3f8; padding:20px; border-radius:10px; margin-top:10px; margin-bottom:20px;'>
-                <p style='font-size:18px; color:#111;'><b>'{st.session_state.drama_actual['title']}'</b> tiene <b>{st.session_state.episodios_mostrados}</b> episodios.<br>
-                ¿Verdadero o falso?</p>
+                <p style='font-size:18px; color:#111;'><b>'{datos['titulo']}'</b> tiene <b>{datos['episodios_mostrados']}</b> episodios.</p>
+                <p style='font-size:16px; color:#111;'>¿Verdadero o falso?</p>
             </div>
         """, unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)
 
-        if not st.session_state.mostrar_resultado:
-            with col1:
-                if st.button("✅ VERDADERO"):
-                    if st.session_state.episodios_mostrados == st.session_state.drama_actual['number_of_episodes']:
-                        st.session_state.resultado_mensaje = "¡Correcto!"
-                        st.session_state.puntos += 1
-                        st.session_state.resultado_correcto = True
-                    else:
-                        st.session_state.resultado_mensaje = f"Incorrecto. Tiene {st.session_state.drama_actual['number_of_episodes']} episodios."
-                        st.session_state.resultado_correcto = False
-                    st.session_state.mostrar_resultado = True
+        with col1:
+            if st.button("✅ VERDADERO", key="v"):
+                if datos['episodios_mostrados'] == datos['episodios_reales']:
+                    st.session_state.resultado = "✅ ¡Correcto!"
+                    st.session_state.puntos += 1
+                else:
+                    st.session_state.resultado = f"❌ Incorrecto. Tiene {datos['episodios_reales']} episodios."
 
-            with col2:
-                if st.button("❌ FALSO"):
-                    if st.session_state.episodios_mostrados != st.session_state.drama_actual['number_of_episodes']:
-                        st.session_state.resultado_mensaje = "¡Correcto!"
-                        st.session_state.puntos += 1
-                        st.session_state.resultado_correcto = True
-                    else:
-                        st.session_state.resultado_mensaje = f"Incorrecto. Tiene {st.session_state.drama_actual['number_of_episodes']} episodios."
-                        st.session_state.resultado_correcto = False
-                    st.session_state.mostrar_resultado = True
+        with col2:
+            if st.button("❌ FALSO", key="f"):
+                if datos['episodios_mostrados'] != datos['episodios_reales']:
+                    st.session_state.resultado = "✅ ¡Correcto!"
+                    st.session_state.puntos += 1
+                else:
+                    st.session_state.resultado = f"❌ Incorrecto. Tiene {datos['episodios_reales']} episodios."
 
-        if st.session_state.mostrar_resultado:
-            if st.session_state.resultado_correcto:
-                st.success(st.session_state.resultado_mensaje)
+        if st.session_state.resultado:
+            if "✅" in st.session_state.resultado:
+                st.success(st.session_state.resultado)
             else:
-                st.error(st.session_state.resultado_mensaje)
+                st.error(st.session_state.resultado)
 
             if st.button("➡️ Siguiente ronda"):
                 st.session_state.ronda += 1
-                st.session_state.mostrar_resultado = False
-                st.session_state.resultado_mensaje = ""
-                st.session_state.resultado_correcto = False
-                st.session_state.pop("drama_actual", None)
+                st.session_state.resultado = ""
+                st.session_state.drama_actual = None
 
-    elif st.session_state.ronda > 3:
-        st.session_state.juego_terminado = True
-        st.markdown(f"""
-            <div style='background-color:#ffeef5; padding:20px; border-radius:10px;'>
-                <h3 style='color:#000;'>🎉 Juego terminado</h3>
-                <p style='font-size:16px;'>Tu puntaje final fue: <b>{st.session_state.puntos}/3</b></p>
-            </div>
-        """, unsafe_allow_html=True)
+    else:
+        st.success(f"🎉 Juego terminado. Tu puntaje fue: {st.session_state.puntos}/3")
         st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
 
         if st.button("🔄 Volver a jugar"):
-            st.session_state.puntos = 0
             st.session_state.ronda = 1
-            st.session_state.juego_terminado = False
-            st.session_state.mostrar_resultado = False
-            st.session_state.resultado_mensaje = ""
-            st.session_state.resultado_correcto = False
-            st.session_state.pop("drama_actual", None)
+            st.session_state.puntos = 0
+            st.session_state.drama_actual = None
+            st.session_state.resultado = ""
