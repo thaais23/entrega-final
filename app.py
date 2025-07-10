@@ -109,7 +109,7 @@ elif opcion == "☁️ Nube de palabras en títulos":
     ax.axis("off")
     st.pyplot(fig)
 
-# Filtrar por año - nueva versión
+# Filtrar por año - versión final
 elif opcion == "🔍 Filtrar por año":
     st.subheader("📅 Busca K-dramas por año de estreno")
 
@@ -136,7 +136,7 @@ elif opcion == "🔍 Filtrar por año":
 
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# Minijuego - corregido
+# Mini juego - versión final y legible
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.subheader("🎲 Juego: ¿Verdadero o falso sobre los episodios?")
 
@@ -153,8 +153,9 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         st.markdown(f"<div style='background-color:#fff3f8; padding:15px; border-radius:10px; color:#111; font-weight:600;'>'{drama['title']}' tiene {alterado} episodios.<br><br>¿Verdadero o falso?</div>", unsafe_allow_html=True)
         
         col1, col2 = st.columns(2)
+
         with col1:
-            if st.button("🌸 Verdadero", key=f"v_{st.session_state.ronda}"):
+            if st.button("✅ VERDADERO", key=f"v_{st.session_state.ronda}", help="Haz clic si crees que es cierto"):
                 correcto = alterado == drama['number_of_episodes']
                 if correcto:
                     st.success("¡Correcto!")
@@ -164,7 +165,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
                 st.session_state.ronda += 1
 
         with col2:
-            if st.button("🌼 Falso", key=f"f_{st.session_state.ronda}"):
+            if st.button("❌ FALSO", key=f"f_{st.session_state.ronda}", help="Haz clic si crees que es falso"):
                 correcto = alterado != drama['number_of_episodes']
                 if correcto:
                     st.success("¡Correcto!")
