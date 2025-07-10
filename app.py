@@ -9,7 +9,7 @@ from collections import Counter
 # 🌼 Configuración general
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# 🎨 Estilos finales corregidos
+# 🎨 CSS FINAL con todos los detalles exactos
 st.markdown("""
     <style>
         html, body, .stApp {
@@ -29,22 +29,24 @@ st.markdown("""
             color: #222 !important;
         }
 
-        /* Mensaje de éxito (filtrar por año) */
+        /* MENSAJE: 'Se encontraron...' */
         .stAlert-success {
             background-color: #ffe6ef !important;
             border-left: 6px solid #f48fb1 !important;
             color: #222 !important;
+            font-weight: bold;
         }
 
-        /* Tabla de resultados */
+        /* RESULTADO (tabla): igual a selector de año */
         .stDataFrame div {
-            background-color: #f9f9f9 !important;
+            background-color: #f4f4f4 !important;
             color: #222 !important;
+            border-radius: 6px;
         }
 
-        /* Selector de año */
+        /* SELECTOR DE AÑO */
         div[data-baseweb="select"] {
-            background-color: #ffffff !important;
+            background-color: #f4f4f4 !important;
             color: #222 !important;
             border: 1px solid #ccc !important;
             border-radius: 6px;
@@ -55,7 +57,7 @@ st.markdown("""
             font-weight: bold;
         }
 
-        /* Radios del juego */
+        /* RADIO DEL MINIJUEGO: texto negro */
         div[data-baseweb="radio"] label {
             background-color: #ffeef5 !important;
             color: #222 !important;
@@ -64,18 +66,17 @@ st.markdown("""
             font-weight: 500;
         }
 
-        /* Botón 'Responder' */
-        button[kind="primary"] {
-            background-color: #ffe4ec !important;
+        /* TEXTO DE LA PREGUNTA (del juego) */
+        .stMarkdown {
             color: #222 !important;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 14px;
         }
 
-        /* Texto general de preguntas y markdowns */
-        .stMarkdown, .stRadio label {
-            color: #222 !important;
+        /* BOTÓN RESPONDER: fondo negro, texto blanco */
+        button[kind="primary"] {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            border-radius: 6px;
+            padding: 8px 14px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -84,10 +85,8 @@ st.markdown("""
 df = pd.read_csv("kdrama_DATASET.csv")
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
-# 📷 Imagen decorativa en sidebar
+# 📷 Sidebar
 st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_container_width=True)
-
-# 📋 Menú principal
 opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🏠 Inicio",
     "📅 Producción por año",
@@ -97,7 +96,7 @@ opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🎮 Mini juego: ¿Verdadero o falso?"
 ])
 
-# 🏠 Página de inicio
+# 🏠 Inicio
 if opcion == "🏠 Inicio":
     st.image("Songjoongkipng.png", use_container_width=True)
     st.markdown("<h1 style='text-align:center;'>Bienvenid@ a tu app de K-dramas ✨</h1>", unsafe_allow_html=True)
@@ -161,8 +160,9 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         drama = df[['title', 'number_of_episodes']].dropna().sample(1).iloc[0]
         alterado = drama['number_of_episodes'] + random.choice([-3, -1, 0, +2, +4])
         pregunta = f"'{drama['title']}' tiene {alterado} episodios. ¿Verdadero o falso?"
-        st.write(f"🔹 Ronda {st.session_state.ronda}")
-        respuesta = st.radio(pregunta, ["Verdadero", "Falso"], key=f"ronda_{st.session_state.ronda}")
+        st.markdown(f"🔹 Ronda {st.session_state.ronda}")
+        st.markdown(f"**{pregunta}**")  # Pregunta en negro
+        respuesta = st.radio("Selecciona tu respuesta:", ["Verdadero", "Falso"], key=f"ronda_{st.session_state.ronda}")
 
         if st.button("Responder", key=f"btn_{st.session_state.ronda}"):
             correcto = "Verdadero" if alterado == drama['number_of_episodes'] else "Falso"
