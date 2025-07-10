@@ -113,7 +113,7 @@ elif opcion == "🔍 Filtrar por año":
         st.warning("No se encontraron resultados para este año.")
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# MINI JUEGO REPARADO
+# MINI JUEGO CORREGIDO FINAL
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
 
@@ -134,15 +134,8 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         st.success(f"🎉 Juego terminado. Tu puntaje fue: {estado['puntos']}/3")
         st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
         if st.button("🔄 Volver a jugar"):
-            st.session_state.estado_juego = {
-                "ronda": 1,
-                "puntos": 0,
-                "drama": None,
-                "respuesta": "",
-                "resultado": "",
-                "mostrar_pregunta": True,
-                "juego_terminado": False
-            }
+            del st.session_state.estado_juego
+            st.experimental_rerun()
         st.stop()
 
     st.markdown(f"<h4 style='color:#444;'>🔹 Ronda {estado['ronda']} de 3</h4>", unsafe_allow_html=True)
@@ -184,6 +177,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             else:
                 estado["resultado"] = f"❌ Incorrecto. Tiene {drama['real']} episodios."
             estado["mostrar_pregunta"] = False
+            st.experimental_rerun()  # 🔄 RECARGAR para mostrar solo resultado
 
     if not estado["mostrar_pregunta"] and estado["resultado"]:
         st.markdown(f"""
@@ -194,9 +188,11 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
 
         if st.button("➡️ Siguiente ronda"):
             estado["ronda"] += 1
-            estado["drama"] = None
-            estado["respuesta"] = ""
-            estado["resultado"] = ""
-            estado["mostrar_pregunta"] = True
             if estado["ronda"] > 3:
                 estado["juego_terminado"] = True
+            else:
+                estado["drama"] = None
+                estado["respuesta"] = ""
+                estado["resultado"] = ""
+                estado["mostrar_pregunta"] = True
+                st.experimental_rerun()  # 🔄 Recargar para que se borre todo
