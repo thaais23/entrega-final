@@ -41,7 +41,7 @@ df = pd.read_csv("kdrama_DATASET.csv")
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
 # 📷 Imagen decorativa en sidebar
-st.sidebar.image("Nevertheless", caption="✨ K-drama vibes", use_column_width=True)
+st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_column_width=True)
 
 # 📋 Menú principal
 opcion = st.sidebar.radio("📌 Elige qué explorar:", [
@@ -89,7 +89,7 @@ elif opcion == "🔍 Filtrar por año":
     st.dataframe(filtrado[['title', 'genre', 'number_of_episodes']])
 
     # Imagen de ambientación decorativa
-    st.image("Lovenextdoor", caption="Una escena de K-drama", use_column_width=False, width=300)
+    st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_column_width=False, width=300)
 
 # 🎮 Opción 5: Mini juego interactivo
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
@@ -118,4 +118,4 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         if st.button("Reiniciar juego"):
             st.session_state.puntos = 0
             st.session_state.ronda = 1
-        st.image("Collagecuadrado", caption="¡Gracias por jugar!", use_column_width=False, width=250)
+        st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_column_width=False, width=250)
