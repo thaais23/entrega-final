@@ -8,7 +8,7 @@ from collections import Counter
 
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# Estilos en CSS
+# Estilos personalizados
 st.markdown("""
     <style>
         html, body, .stApp {
@@ -40,14 +40,7 @@ st.markdown("""
             color: #000000 !important;
         }
 
-        div[data-baseweb="select"] {
-            background-color: #ffffff !important;
-            color: #000000 !important;
-            border: 1px solid #ccc !important;
-            border-radius: 6px;
-        }
-
-        .stSelectbox label {
+        .stSelectbox label, .stSlider label {
             color: #000000 !important;
             font-weight: bold;
         }
@@ -62,7 +55,7 @@ st.markdown("""
 df = pd.read_csv("kdrama_DATASET.csv")
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
-# Menú
+# Menú lateral
 st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_container_width=True)
 opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🏠 Inicio",
@@ -116,28 +109,34 @@ elif opcion == "☁️ Nube de palabras en títulos":
     ax.axis("off")
     st.pyplot(fig)
 
-# Filtrar por año
+# Filtrar por año - nueva versión
 elif opcion == "🔍 Filtrar por año":
-    st.subheader("📅 Filtrar K-dramas por año de estreno")
+    st.subheader("📅 Busca K-dramas por año de estreno")
 
     años = sorted(df['year_of_release'].dropna().unique())
-    año = st.selectbox("Selecciona un año", años)
+    año = st.slider("Selecciona el año", int(min(años)), int(max(años)), int(max(años)))
 
     filtrado = df[df['year_of_release'] == año]
 
     st.markdown(
-        f"<div style='background-color:#ffe6ef; padding:10px; border-radius:8px; color:#000000; font-weight:bold;'>🎬 Se encontraron {len(filtrado)} títulos en {año}.</div>",
+        f"<div style='background-color:#ffeef5; padding:15px; border-radius:10px; color:#111; font-weight:600;'>🎬 En {año} se estrenaron <b>{len(filtrado)}</b> títulos.</div>",
         unsafe_allow_html=True
     )
 
     if not filtrado.empty:
-        st.dataframe(filtrado[['title', 'genre', 'number_of_episodes']])
+        for index, row in filtrado.iterrows():
+            st.markdown(f"""
+                <div style='background-color:#ffffff; border-radius:8px; padding:10px; margin-bottom:10px; border:1px solid #f0c3d0'>
+                    <b>{row['title']}</b><br>
+                    🎭 <i>{row['genre']}</i> &nbsp;&nbsp;|&nbsp;&nbsp; 🎞️ {row['number_of_episodes']} episodios
+                </div>
+            """, unsafe_allow_html=True)
     else:
-        st.warning("No hay datos para ese año.")
+        st.warning("No se encontraron resultados para este año.")
 
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# Mini juego
+# Minijuego - corregido
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.subheader("🎲 Juego: ¿Verdadero o falso sobre los episodios?")
 
@@ -147,17 +146,15 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         st.session_state.ronda = 1
 
     if st.session_state.ronda <= 3:
-        container = st.container()
         drama = df[['title', 'number_of_episodes']].dropna().sample(1).iloc[0]
         alterado = drama['number_of_episodes'] + random.choice([-3, -1, 0, +2, +4])
 
-        container.markdown(f"### 🔹 Ronda {st.session_state.ronda}")
-        container.markdown(f"**'{drama['title']}' tiene {alterado} episodios. ¿Verdadero o falso?**")
-
-        col1, col2 = container.columns(2)
-
+        st.markdown(f"### 🔹 Ronda {st.session_state.ronda}")
+        st.markdown(f"<div style='background-color:#fff3f8; padding:15px; border-radius:10px; color:#111; font-weight:600;'>'{drama['title']}' tiene {alterado} episodios.<br><br>¿Verdadero o falso?</div>", unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
         with col1:
-            if st.button("✅ Verdadero"):
+            if st.button("🌸 Verdadero", key=f"v_{st.session_state.ronda}"):
                 correcto = alterado == drama['number_of_episodes']
                 if correcto:
                     st.success("¡Correcto!")
@@ -167,7 +164,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
                 st.session_state.ronda += 1
 
         with col2:
-            if st.button("❌ Falso"):
+            if st.button("🌼 Falso", key=f"f_{st.session_state.ronda}"):
                 correcto = alterado != drama['number_of_episodes']
                 if correcto:
                     st.success("¡Correcto!")
