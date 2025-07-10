@@ -50,7 +50,7 @@ opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🎮 Mini juego: ¿Verdadero o falso?"
 ])
 
-# PÁGINA: INICIO
+# INICIO
 if opcion == "🏠 Inicio":
     st.image("Songjoongkipng.png", use_container_width=True)
     st.markdown("<h1 style='text-align:center;'>Bienvenid@ a tu app de K-dramas ✨</h1>", unsafe_allow_html=True)
@@ -64,7 +64,7 @@ elif opcion == "📅 Producción por año":
     plt.xticks(rotation=45)
     st.pyplot(fig)
 
-# GÉNEROS MÁS COMUNES
+# GÉNEROS
 elif opcion == "🎭 Géneros más comunes":
     st.subheader("🎬 Top 10 géneros más frecuentes en K-dramas")
     generos = df['genre'].dropna().str.split(", ")
@@ -113,11 +113,10 @@ elif opcion == "🔍 Filtrar por año":
         st.warning("No se encontraron resultados para este año.")
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# MINI JUEGO CORREGIDO
+# MINI JUEGO REPARADO
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
 
-    # Inicializar estados
     if "estado_juego" not in st.session_state:
         st.session_state.estado_juego = {
             "ronda": 1,
@@ -186,7 +185,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
                 estado["resultado"] = f"❌ Incorrecto. Tiene {drama['real']} episodios."
             estado["mostrar_pregunta"] = False
 
-    if not estado["mostrar_pregunta"]:
+    if not estado["mostrar_pregunta"] and estado["resultado"]:
         st.markdown(f"""
             <div style='background-color:#ffe6ef; padding:15px; border-radius:10px; color:#000; font-size:16px;'>
                 {estado["resultado"]}
