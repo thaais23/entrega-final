@@ -16,29 +16,52 @@ st.markdown("""
             background-color: #fff0f5;
             color: #222;
         }
-        h1, h2, h3 {
+
+        h1, h2, h3, h4 {
             color: #e91e63 !important;
         }
-        .stRadio > div {
+
+        /* Sidebar gris claro con letras negras */
+        section[data-testid="stSidebar"] {
+            background-color: #f0f0f0 !important;
+        }
+        section[data-testid="stSidebar"] * {
             color: #222 !important;
         }
-        /* Sidebar */
-        section[data-testid="stSidebar"] {
-            background-color: #f0f0f0;
-        }
-        /* Selectbox */
-        .stSelectbox div[data-baseweb="select"] {
+
+        /* Selector (año) con fondo claro y letra visible */
+        div[data-baseweb="select"] {
             background-color: #fffafc !important;
             color: #222 !important;
         }
-        /* Mensaje de éxito */
-        .stAlert.success {
-            background-color: #fce4ec;
-            color: #222;
+
+        /* Mensaje de éxito (se encontraron títulos...) */
+        .stAlert-success {
+            background-color: #fdecef !important;
+            border-left: 0.5rem solid #f48fb1 !important;
+            color: #222 !important;
         }
-        /* Texto radio buttons */
+
+        /* Radio buttons */
         label[data-baseweb="radio"] {
-            color: #333 !important;
+            color: #222 !important;
+            background-color: #fffafc !important;
+            padding: 4px 8px;
+            border-radius: 5px;
+        }
+
+        /* Botones */
+        button[kind="primary"] {
+            color: #222 !important;
+            background-color: #ffe0eb !important;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+        }
+
+        .stDataFrame {
+            background-color: #ffffff !important;
+            color: #222 !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -50,7 +73,7 @@ df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 # 📷 Imagen decorativa en el sidebar
 st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_container_width=True)
 
-# 📋 Menú de navegación
+# 📋 Menú
 opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🏠 Inicio",
     "📅 Producción por año",
@@ -60,7 +83,7 @@ opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🎮 Mini juego: ¿Verdadero o falso?"
 ])
 
-# 🏠 Página de inicio
+# 🏠 INICIO
 if opcion == "🏠 Inicio":
     st.image("Songjoongkipng.png", use_container_width=True)
     st.markdown("<h1 style='text-align:center;'>Bienvenid@ a tu app de K-dramas ✨</h1>", unsafe_allow_html=True)
