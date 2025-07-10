@@ -145,58 +145,56 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         st.session_state.ronda = 1
     if "drama_actual" not in st.session_state:
         st.session_state.drama_actual = None
-    if "resultado" not in st.session_state:
-        st.session_state.resultado = ""
+    if "respuesta_usuario" not in st.session_state:
+        st.session_state.respuesta_usuario = ""
+    if "mostrar_resultado" not in st.session_state:
+        st.session_state.mostrar_resultado = False
 
     if st.session_state.ronda <= 3:
-        st.markdown(f"<h4 style='color:#555;'>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
+        st.markdown(f"<h4 style='color:#444;'>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
 
         if st.session_state.drama_actual is None:
             drama = df[['title', 'number_of_episodes']].dropna().sample(1).iloc[0]
-            alterado = drama['number_of_episodes'] + random.choice([-3, -2, 0, +2, +3])
+            alterado = drama['number_of_episodes'] + random.choice([-3, -1, 0, +2, +3])
             st.session_state.drama_actual = {
                 "titulo": drama['title'],
-                "episodios_reales": drama['number_of_episodes'],
-                "episodios_mostrados": alterado
+                "real": drama['number_of_episodes'],
+                "mostrado": alterado
             }
 
         datos = st.session_state.drama_actual
 
         st.markdown(f"""
-            <div style='background-color:#fff3f8; padding:20px; border-radius:10px; margin-top:10px; margin-bottom:20px;'>
-                <p style='font-size:18px; color:#111;'><b>'{datos['titulo']}'</b> tiene <b>{datos['episodios_mostrados']}</b> episodios.</p>
-                <p style='font-size:16px; color:#111;'>¿Verdadero o falso?</p>
+            <div style='background-color:#fff3f8; padding:25px; border-radius:12px;'>
+                <p style='font-size:18px; color:#000;'><b>{datos['titulo']}</b> tiene <b>{datos['mostrado']}</b> episodios.</p>
+                <p style='font-size:16px; color:#000;'>¿Crees que es verdadero o falso?</p>
             </div>
         """, unsafe_allow_html=True)
 
-        col1, col2 = st.columns(2)
+        opciones = ["Verdadero", "Falso"]
+        respuesta = st.radio("Selecciona tu respuesta:", opciones, index=None, horizontal=True)
 
-        with col1:
-            if st.button("✅ VERDADERO", key="v"):
-                if datos['episodios_mostrados'] == datos['episodios_reales']:
-                    st.session_state.resultado = "✅ ¡Correcto!"
+        if respuesta:
+            st.session_state.respuesta_usuario = respuesta
+            if st.button("📩 Confirmar respuesta"):
+                correcto = (
+                    (respuesta == "Verdadero" and datos['mostrado'] == datos['real']) or
+                    (respuesta == "Falso" and datos['mostrado'] != datos['real'])
+                )
+
+                if correcto:
+                    st.success("✅ ¡Correcto!")
                     st.session_state.puntos += 1
                 else:
-                    st.session_state.resultado = f"❌ Incorrecto. Tiene {datos['episodios_reales']} episodios."
+                    st.error(f"❌ Incorrecto. Tiene {datos['real']} episodios.")
+                st.session_state.mostrar_resultado = True
 
-        with col2:
-            if st.button("❌ FALSO", key="f"):
-                if datos['episodios_mostrados'] != datos['episodios_reales']:
-                    st.session_state.resultado = "✅ ¡Correcto!"
-                    st.session_state.puntos += 1
-                else:
-                    st.session_state.resultado = f"❌ Incorrecto. Tiene {datos['episodios_reales']} episodios."
-
-        if st.session_state.resultado:
-            if "✅" in st.session_state.resultado:
-                st.success(st.session_state.resultado)
-            else:
-                st.error(st.session_state.resultado)
-
+        if st.session_state.mostrar_resultado:
             if st.button("➡️ Siguiente ronda"):
                 st.session_state.ronda += 1
-                st.session_state.resultado = ""
                 st.session_state.drama_actual = None
+                st.session_state.respuesta_usuario = ""
+                st.session_state.mostrar_resultado = False
 
     else:
         st.success(f"🎉 Juego terminado. Tu puntaje fue: {st.session_state.puntos}/3")
@@ -206,4 +204,5 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             st.session_state.ronda = 1
             st.session_state.puntos = 0
             st.session_state.drama_actual = None
-            st.session_state.resultado = ""
+            st.session_state.respuesta_usuario = ""
+            st.session_state.mostrar_resultado = False
