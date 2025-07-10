@@ -6,9 +6,10 @@ from wordcloud import WordCloud
 import random
 from collections import Counter
 
+# Configuración inicial
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# ✅ CSS correcto según tus indicaciones
+# CSS general
 st.markdown("""
     <style>
         html, body, .stApp {
@@ -28,7 +29,6 @@ st.markdown("""
             color: #222 !important;
         }
 
-        /* ✅ Mensaje “Se encontraron…” con fondo rosa y texto negro */
         .stAlert-success {
             background-color: #ffe6ef !important;
             border-left: 6px solid #f48fb1 !important;
@@ -36,13 +36,11 @@ st.markdown("""
             font-weight: bold;
         }
 
-        /* ✅ Resultado de filtrado estilo limpio blanco y visible */
         .stDataFrame div {
             background-color: #ffffff !important;
             color: #000000 !important;
         }
 
-        /* ✅ Selector de año estilo limpio */
         div[data-baseweb="select"] {
             background-color: #ffffff !important;
             color: #000000 !important;
@@ -55,36 +53,17 @@ st.markdown("""
             font-weight: bold;
         }
 
-        /* ✅ Radios del minijuego: texto negro, fondo claro */
-        div[data-baseweb="radio"] label {
-            background-color: #fff3f7 !important;
-            color: #000000 !important;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: 500;
-        }
-
-        /* ✅ Botón “Responder”: fondo rosado claro, texto negro */
-        button[kind="primary"] {
-            background-color: #ffe4ec !important;
-            color: #000000 !important;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 14px;
-        }
-
-        /* ✅ Texto de pregunta en minijuego */
         .stMarkdown {
             color: #000000 !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# 📚 Cargar dataset
+# Cargar dataset
 df = pd.read_csv("kdrama_DATASET.csv")
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
-# 📋 Menú lateral
+# Menú lateral
 st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_container_width=True)
 opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🏠 Inicio",
@@ -95,13 +74,13 @@ opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🎮 Mini juego: ¿Verdadero o falso?"
 ])
 
-# 🏠 Inicio
+# Inicio
 if opcion == "🏠 Inicio":
     st.image("Songjoongkipng.png", use_container_width=True)
     st.markdown("<h1 style='text-align:center;'>Bienvenid@ a tu app de K-dramas ✨</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center;'>Analiza, explora y diviértete con los mejores títulos coreanos 💕</p>", unsafe_allow_html=True)
 
-# 📅 Producción por año
+# Producción por año
 elif opcion == "📅 Producción por año":
     st.subheader("📈 Cantidad de K-dramas producidos por año")
     sns.set_style("whitegrid")
@@ -110,7 +89,7 @@ elif opcion == "📅 Producción por año":
     plt.xticks(rotation=45)
     st.pyplot(fig)
 
-# 🎭 Géneros más comunes
+# Géneros más comunes
 elif opcion == "🎭 Géneros más comunes":
     st.subheader("🎬 Top 10 géneros más frecuentes en K-dramas")
     sns.set_style("whitegrid")
@@ -128,7 +107,7 @@ elif opcion == "🎭 Géneros más comunes":
     ax.set_ylabel("Frecuencia")
     st.pyplot(fig)
 
-# ☁️ Nube de palabras
+# Nube de palabras
 elif opcion == "☁️ Nube de palabras en títulos":
     st.subheader("☁️ Palabras más comunes en los títulos de K-dramas")
     textos = " ".join(df['title'].dropna())
@@ -138,42 +117,67 @@ elif opcion == "☁️ Nube de palabras en títulos":
     ax.axis("off")
     st.pyplot(fig)
 
-# 🔍 Filtrar por año
+# NUEVO: Filtrar por año
 elif opcion == "🔍 Filtrar por año":
     st.subheader("📅 Filtrar K-dramas por año de estreno")
-    años = sorted(df['year_of_release'].dropna().unique())
-    año = st.selectbox("Selecciona un año", años)
+    
+    with st.expander("Selecciona el año que quieres analizar"):
+        años = sorted(df['year_of_release'].dropna().unique())
+        año = st.selectbox("🎯 Año de lanzamiento", años, index=len(años)-1)
+
     filtrado = df[df['year_of_release'] == año]
-    st.success(f"🎬 Se encontraron {len(filtrado)} títulos en {año}.")
+
+    st.markdown(
+        f"<div style='background-color:#ffe6ef; padding:10px; border-radius:8px; color:#000; font-weight:bold;'>🎬 Se encontraron {len(filtrado)} títulos en {año}.</div>",
+        unsafe_allow_html=True
+    )
+
     st.dataframe(filtrado[['title', 'genre', 'number_of_episodes']])
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# 🎮 Minijuego
+# NUEVO: Minijuego
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
-    st.subheader("🎲 Adivina si el número de episodios es correcto")
+    st.subheader("🎲 Juego: ¿Verdadero o falso sobre los episodios?")
+
     if "puntos" not in st.session_state:
         st.session_state.puntos = 0
         st.session_state.ronda = 1
+        st.session_state.jugando = True
 
-    if st.session_state.ronda <= 3:
+    if st.session_state.ronda <= 3 and st.session_state.jugando:
+
+        container = st.container()
         drama = df[['title', 'number_of_episodes']].dropna().sample(1).iloc[0]
         alterado = drama['number_of_episodes'] + random.choice([-3, -1, 0, +2, +4])
-        pregunta = f"'{drama['title']}' tiene {alterado} episodios. ¿Verdadero o falso?"
-        st.markdown(f"🔹 Ronda {st.session_state.ronda}")
-        st.markdown(f"**{pregunta}**")
-        respuesta = st.radio("Selecciona tu respuesta:", ["Verdadero", "Falso"], key=f"ronda_{st.session_state.ronda}")
 
-        if st.button("Responder", key=f"btn_{st.session_state.ronda}"):
-            correcto = "Verdadero" if alterado == drama['number_of_episodes'] else "Falso"
-            if respuesta == correcto:
-                st.success("✅ ¡Correcto!")
-                st.session_state.puntos += 1
-            else:
-                st.error(f"❌ Incorrecto. El número real es {drama['number_of_episodes']}.")
-            st.session_state.ronda += 1
-    else:
-        st.success(f"🎉 Juego terminado. Tu puntaje final fue: {st.session_state.puntos}/3")
-        if st.button("Reiniciar juego"):
+        container.markdown(f"### 🔹 Ronda {st.session_state.ronda}")
+        container.markdown(f"**'{drama['title']}' tiene {alterado} episodios. ¿Verdadero o falso?**")
+
+        col1, col2 = container.columns(2)
+        with col1:
+            if st.button("✅ Verdadero"):
+                correcto = alterado == drama['number_of_episodes']
+                if correcto:
+                    st.success("¡Correcto!")
+                    st.session_state.puntos += 1
+                else:
+                    st.error(f"Incorrecto. Tiene {drama['number_of_episodes']} episodios.")
+                st.session_state.ronda += 1
+
+        with col2:
+            if st.button("❌ Falso"):
+                correcto = alterado != drama['number_of_episodes']
+                if correcto:
+                    st.success("¡Correcto!")
+                    st.session_state.puntos += 1
+                else:
+                    st.error(f"Incorrecto. Tiene {drama['number_of_episodes']} episodios.")
+                st.session_state.ronda += 1
+
+    elif st.session_state.ronda > 3:
+        st.success(f"🎉 Juego terminado. Tu puntaje fue: {st.session_state.puntos}/3")
+        if st.button("🔄 Volver a jugar"):
             st.session_state.puntos = 0
             st.session_state.ronda = 1
+            st.session_state.jugando = True
         st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
