@@ -32,19 +32,6 @@ st.markdown("""
             padding: 0.5em 1em;
             border: none;
         }
-
-        div.row-widget.stRadio > div {
-            flex-direction: row;
-        }
-        div.row-widget.stRadio label > div {
-            color: white !important;
-            background-color: black;
-            font-weight: bold;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin: 5px;
-            text-align: center;
-        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -126,7 +113,7 @@ elif opcion == "🔍 Filtrar por año":
         st.warning("No se encontraron resultados para este año.")
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# MINI JUEGO FINAL
+# MINI JUEGO – BOTONES NUEVOS
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
 
@@ -171,26 +158,25 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             </div>
         """, unsafe_allow_html=True)
 
-        respuesta = st.radio(
-            "Selecciona tu respuesta",
-            ["Verdadero", "Falso"],
-            index=None,
-            horizontal=True,
-            label_visibility="collapsed"
-        )
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✔️ Verdadero"):
+                st.session_state.respuesta = "Verdadero"
+        with col2:
+            if st.button("❌ Falso"):
+                st.session_state.respuesta = "Falso"
 
-        if respuesta:
-            if st.button("📩 Confirmar respuesta"):
-                correcta = (
-                    (respuesta == "Verdadero" and drama['mostrado'] == drama['real']) or
-                    (respuesta == "Falso" and drama['mostrado'] != drama['real'])
-                )
-                if correcta:
-                    st.session_state.resultado = f"✅ ¡Correcto! Tiene {drama['real']} episodios."
-                    st.session_state.puntos += 1
-                else:
-                    st.session_state.resultado = f"❌ Incorrecto. Tiene {drama['real']} episodios."
-                st.session_state.mostrar_pregunta = False
+        if st.session_state.respuesta:
+            correcta = (
+                (st.session_state.respuesta == "Verdadero" and drama['mostrado'] == drama['real']) or
+                (st.session_state.respuesta == "Falso" and drama['mostrado'] != drama['real'])
+            )
+            if correcta:
+                st.session_state.resultado = f"✅ ¡Correcto! Tiene {drama['real']} episodios."
+                st.session_state.puntos += 1
+            else:
+                st.session_state.resultado = f"❌ Incorrecto. Tiene {drama['real']} episodios."
+            st.session_state.mostrar_pregunta = False
 
     if not st.session_state.mostrar_pregunta:
         st.markdown(f"""
