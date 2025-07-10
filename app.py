@@ -113,44 +113,52 @@ elif opcion == "🔍 Filtrar por año":
         st.warning("No se encontraron resultados para este año.")
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# MINI JUEGO – BOTONES NUEVOS
+# MINI JUEGO CORREGIDO
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
 
-    for clave, valor in {
-        "ronda": 1,
-        "puntos": 0,
-        "drama": None,
-        "respuesta": "",
-        "resultado": "",
-        "mostrar_pregunta": True,
-        "juego_terminado": False
-    }.items():
-        if clave not in st.session_state:
-            st.session_state[clave] = valor
+    # Inicializar estados
+    if "estado_juego" not in st.session_state:
+        st.session_state.estado_juego = {
+            "ronda": 1,
+            "puntos": 0,
+            "drama": None,
+            "respuesta": "",
+            "resultado": "",
+            "mostrar_pregunta": True,
+            "juego_terminado": False
+        }
 
-    if st.session_state.juego_terminado:
-        st.success(f"🎉 Juego terminado. Tu puntaje fue: {st.session_state.puntos}/3")
+    estado = st.session_state.estado_juego
+
+    if estado["juego_terminado"]:
+        st.success(f"🎉 Juego terminado. Tu puntaje fue: {estado['puntos']}/3")
         st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
         if st.button("🔄 Volver a jugar"):
-            for clave in st.session_state:
-                del st.session_state[clave]
-            st.experimental_rerun()
+            st.session_state.estado_juego = {
+                "ronda": 1,
+                "puntos": 0,
+                "drama": None,
+                "respuesta": "",
+                "resultado": "",
+                "mostrar_pregunta": True,
+                "juego_terminado": False
+            }
         st.stop()
 
-    st.markdown(f"<h4 style='color:#444;'>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
+    st.markdown(f"<h4 style='color:#444;'>🔹 Ronda {estado['ronda']} de 3</h4>", unsafe_allow_html=True)
 
-    if st.session_state.drama is None:
+    if estado["drama"] is None:
         muestra = df[['title', 'number_of_episodes']].dropna()
         elegido = muestra.sample(1).iloc[0]
         titulo = str(elegido['title'])
         real = int(elegido['number_of_episodes'])
         mostrado = real + random.choice([-3, -2, 0, +2, +3])
-        st.session_state.drama = {"titulo": titulo, "real": real, "mostrado": mostrado}
+        estado["drama"] = {"titulo": titulo, "real": real, "mostrado": mostrado}
 
-    drama = st.session_state.drama
+    drama = estado["drama"]
 
-    if st.session_state.mostrar_pregunta:
+    if estado["mostrar_pregunta"]:
         st.markdown(f"""
             <div style='background-color:#fff3f8; padding:25px; border-radius:12px;'>
                 <p style='font-size:18px; color:#000;'><b>{drama['titulo']}</b> tiene <b>{drama['mostrado']}</b> episodios.</p>
@@ -161,35 +169,35 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         col1, col2 = st.columns(2)
         with col1:
             if st.button("✔️ Verdadero"):
-                st.session_state.respuesta = "Verdadero"
+                estado["respuesta"] = "Verdadero"
         with col2:
             if st.button("❌ Falso"):
-                st.session_state.respuesta = "Falso"
+                estado["respuesta"] = "Falso"
 
-        if st.session_state.respuesta:
+        if estado["respuesta"]:
             correcta = (
-                (st.session_state.respuesta == "Verdadero" and drama['mostrado'] == drama['real']) or
-                (st.session_state.respuesta == "Falso" and drama['mostrado'] != drama['real'])
+                (estado["respuesta"] == "Verdadero" and drama['mostrado'] == drama['real']) or
+                (estado["respuesta"] == "Falso" and drama['mostrado'] != drama['real'])
             )
             if correcta:
-                st.session_state.resultado = f"✅ ¡Correcto! Tiene {drama['real']} episodios."
-                st.session_state.puntos += 1
+                estado["resultado"] = f"✅ ¡Correcto! Tiene {drama['real']} episodios."
+                estado["puntos"] += 1
             else:
-                st.session_state.resultado = f"❌ Incorrecto. Tiene {drama['real']} episodios."
-            st.session_state.mostrar_pregunta = False
+                estado["resultado"] = f"❌ Incorrecto. Tiene {drama['real']} episodios."
+            estado["mostrar_pregunta"] = False
 
-    if not st.session_state.mostrar_pregunta:
+    if not estado["mostrar_pregunta"]:
         st.markdown(f"""
             <div style='background-color:#ffe6ef; padding:15px; border-radius:10px; color:#000; font-size:16px;'>
-                {st.session_state.resultado}
+                {estado["resultado"]}
             </div>
         """, unsafe_allow_html=True)
 
         if st.button("➡️ Siguiente ronda"):
-            st.session_state.ronda += 1
-            st.session_state.drama = None
-            st.session_state.respuesta = ""
-            st.session_state.resultado = ""
-            st.session_state.mostrar_pregunta = True
-            if st.session_state.ronda > 3:
-                st.session_state.juego_terminado = True
+            estado["ronda"] += 1
+            estado["drama"] = None
+            estado["respuesta"] = ""
+            estado["resultado"] = ""
+            estado["mostrar_pregunta"] = True
+            if estado["ronda"] > 3:
+                estado["juego_terminado"] = True
