@@ -6,10 +6,10 @@ from wordcloud import WordCloud
 import random
 from collections import Counter
 
-# 🌼 Configuración general
+# Configurar página
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# 🎨 CSS FINAL con todos los detalles exactos
+# 💅 CSS FINAL Y DEFINITIVO
 st.markdown("""
     <style>
         html, body, .stApp {
@@ -29,63 +29,63 @@ st.markdown("""
             color: #222 !important;
         }
 
-        /* MENSAJE: 'Se encontraron...' */
+        /* ✅ Mensaje de éxito: texto negro */
         .stAlert-success {
             background-color: #ffe6ef !important;
             border-left: 6px solid #f48fb1 !important;
-            color: #222 !important;
+            color: #000000 !important;
             font-weight: bold;
         }
 
-        /* RESULTADO (tabla): igual a selector de año */
+        /* ✅ Caja de resultados estilo selector */
         .stDataFrame div {
             background-color: #f4f4f4 !important;
-            color: #222 !important;
-            border-radius: 6px;
+            color: #000000 !important;
         }
 
-        /* SELECTOR DE AÑO */
+        /* ✅ Selector de año */
         div[data-baseweb="select"] {
             background-color: #f4f4f4 !important;
-            color: #222 !important;
+            color: #000000 !important;
             border: 1px solid #ccc !important;
             border-radius: 6px;
         }
 
         .stSelectbox label {
-            color: #222 !important;
+            color: #000000 !important;
             font-weight: bold;
         }
 
-        /* RADIO DEL MINIJUEGO: texto negro */
+        /* ✅ Radios del minijuego */
         div[data-baseweb="radio"] label {
             background-color: #ffeef5 !important;
-            color: #222 !important;
+            color: #000000 !important;
             padding: 6px 12px;
             border-radius: 6px;
             font-weight: 500;
         }
 
-        /* TEXTO DE LA PREGUNTA (del juego) */
-        .stMarkdown {
-            color: #222 !important;
+        /* ✅ Texto general del minijuego */
+        .stMarkdown, .stRadio label {
+            color: #000000 !important;
         }
 
-        /* BOTÓN RESPONDER: fondo negro, texto blanco */
+        /* ✅ Botón "Responder" con texto blanco y fondo negro */
         button[kind="primary"] {
             background-color: #000000 !important;
             color: #ffffff !important;
+            border: none;
             border-radius: 6px;
             padding: 8px 14px;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# 📚 Cargar dataset
+# Cargar dataset
 df = pd.read_csv("kdrama_DATASET.csv")
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
-# 📷 Sidebar
+# Sidebar y navegación
 st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_container_width=True)
 opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🏠 Inicio",
@@ -149,7 +149,7 @@ elif opcion == "🔍 Filtrar por año":
     st.dataframe(filtrado[['title', 'genre', 'number_of_episodes']])
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# 🎮 Mini juego
+# 🎮 Minijuego
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.subheader("🎲 Adivina si el número de episodios es correcto")
     if "puntos" not in st.session_state:
