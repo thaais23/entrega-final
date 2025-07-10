@@ -36,13 +36,14 @@ st.markdown("""
         div.row-widget.stRadio > div {
             flex-direction: row;
         }
-        div.row-widget.stRadio label {
-            color: #000000 !important;
-            font-weight: 600;
-            background-color: #fce4ec;
+        div.row-widget.stRadio label > div {
+            color: white !important;
+            background-color: black;
+            font-weight: bold;
             padding: 10px 15px;
             border-radius: 8px;
             margin: 5px;
+            text-align: center;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -125,11 +126,10 @@ elif opcion == "🔍 Filtrar por año":
         st.warning("No se encontraron resultados para este año.")
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# MINI JUEGO
+# MINI JUEGO FINAL
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
 
-    # Inicializar estados
     for clave, valor in {
         "ronda": 1,
         "puntos": 0,
@@ -146,16 +146,9 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         st.success(f"🎉 Juego terminado. Tu puntaje fue: {st.session_state.puntos}/3")
         st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
         if st.button("🔄 Volver a jugar"):
-            for clave in ["ronda", "puntos", "drama", "respuesta", "resultado", "mostrar_pregunta", "juego_terminado"]:
-                st.session_state[clave] = {
-                    "ronda": 1,
-                    "puntos": 0,
-                    "drama": None,
-                    "respuesta": "",
-                    "resultado": "",
-                    "mostrar_pregunta": True,
-                    "juego_terminado": False
-                }[clave]
+            for clave in st.session_state:
+                del st.session_state[clave]
+            st.experimental_rerun()
         st.stop()
 
     st.markdown(f"<h4 style='color:#444;'>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
@@ -176,23 +169,6 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
                 <p style='font-size:18px; color:#000;'><b>{drama['titulo']}</b> tiene <b>{drama['mostrado']}</b> episodios.</p>
                 <p style='font-size:16px; color:#000;'>¿Crees que eso es verdadero o falso?</p>
             </div>
-        """, unsafe_allow_html=True)
-
-        # 🖤 Estilo para texto negro en radio
-        st.markdown("""
-            <style>
-                div.row-widget.stRadio > div {
-                    flex-direction: row;
-                }
-                div.row-widget.stRadio label > div {
-                    color: #000000 !important;
-                    font-weight: bold;
-                    background-color: #fce4ec;
-                    padding: 10px 15px;
-                    border-radius: 8px;
-                    margin: 5px;
-                }
-            </style>
         """, unsafe_allow_html=True)
 
         respuesta = st.radio(
