@@ -6,45 +6,38 @@ from wordcloud import WordCloud
 import random
 from collections import Counter
 
-# 🌸 Configuración general de la app
-st.set_page_config(
-    page_title="Explora el Universo de los K-dramas",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# 🌼 Configuración general de la app
+st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# 🎨 Fondo pastel usando markdown y CSS
-st.markdown(
-    """
+# 🎨 Estilo visual de fondo rosado claro + letras oscuras
+st.markdown("""
     <style>
-        body {
+        html, body, .stApp {
             background-color: #fff0f5;
+            color: #222;
         }
-        .stApp {
-            background-color: #fff0f5;
+        h1, h2, h3 {
+            color: #e91e63 !important;
+        }
+        .stRadio > div {
+            color: #222 !important;
+        }
+        .css-18e3th9 {
+            background-color: #fff0f5 !important;
         }
     </style>
-    """,
-    unsafe_allow_html=True
-)
+""", unsafe_allow_html=True)
 
-# 📷 Imagen decorativa de entrada
-st.image("Songjoongkipng.png", use_column_width=True)
-
-# 🌺 Título
-st.markdown("<h1 style='text-align:center; color:#e91e63;'>Explora el Universo de los K-dramas</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Visualiza, analiza y juega con 350 títulos de K-dramas desde 2003 hasta 2025.</p>", unsafe_allow_html=True)
-st.divider()
-
-# 📚 Cargar dataset
+# 📚 Cargar el dataset
 df = pd.read_csv("kdrama_DATASET.csv")
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
-# 📷 Imagen decorativa en sidebar
-st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_column_width=True)
+# 📷 Imagen en sidebar decorativa
+st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_container_width=True)
 
 # 📋 Menú principal
 opcion = st.sidebar.radio("📌 Elige qué explorar:", [
+    "🏠 Inicio",
     "📅 Producción por año",
     "🎭 Géneros más comunes",
     "☁️ Nube de palabras en títulos",
@@ -52,26 +45,44 @@ opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🎮 Mini juego: ¿Verdadero o falso?"
 ])
 
-# 📈 Opción 1: Producción por año
-if opcion == "📅 Producción por año":
+# 🏠 SECCIÓN DE INICIO
+if opcion == "🏠 Inicio":
+    st.image("Songjoongkipng.png", use_container_width=True)
+    st.markdown("<h1 style='text-align:center;'>Bienvenid@ a tu app de K-dramas ✨</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center;'>Analiza, explora y diviértete con los mejores títulos coreanos 💕</p>", unsafe_allow_html=True)
+    st.markdown("Selecciona una opción en el menú lateral para comenzar 📊")
+
+# 📅 Producción por año
+elif opcion == "📅 Producción por año":
     st.subheader("📈 Cantidad de K-dramas producidos por año")
+    sns.set_style("whitegrid")
     fig, ax = plt.subplots(figsize=(12, 6))
     sns.countplot(x='year_of_release', data=df, order=sorted(df['year_of_release'].dropna().unique()), palette="pastel", ax=ax)
     plt.xticks(rotation=45)
     st.pyplot(fig)
 
-# 🎭 Opción 2: Géneros más comunes
+# 🎭 Géneros más comunes
 elif opcion == "🎭 Géneros más comunes":
     st.subheader("🎬 Top 10 géneros más frecuentes en K-dramas")
+    sns.set_style("whitegrid")
     generos = df['genre'].dropna().str.split(", ")
-    generos_flat = [item for sublist in generos for item in sublist]
+    generos_flat = [g for sublist in generos for g in sublist]
     conteo = Counter(generos_flat)
-    df_gen = pd.DataFrame(conteo.most_common(10), columns=["Género", "Frecuencia"])
-    st.bar_chart(df_gen.set_index("Género"))
+    fig, ax = plt.subplots(figsize=(10, 5))
+    sns.barplot(
+        x=[g[0] for g in conteo.most_common(10)],
+        y=[g[1] for g in conteo.most_common(10)],
+        palette="pastel",
+        ax=ax
+    )
+    ax.set_title("Géneros más frecuentes")
+    ax.set_ylabel("Frecuencia")
+    ax.set_xlabel("Género")
+    st.pyplot(fig)
 
-# ☁️ Opción 3: Nube de palabras
+# ☁️ Nube de palabras
 elif opcion == "☁️ Nube de palabras en títulos":
-    st.subheader("☁️ Palabras más comunes en los títulos de K-dramas")
+    st.subheader("🗣️ Palabras más comunes en los títulos de K-dramas")
     textos = " ".join(df['title'].dropna())
     wc = WordCloud(width=800, height=400, background_color="white", colormap="pink").generate(textos)
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -79,21 +90,21 @@ elif opcion == "☁️ Nube de palabras en títulos":
     ax.axis("off")
     st.pyplot(fig)
 
-# 🔍 Opción 4: Filtro por año
+# 🔍 Filtro por año
 elif opcion == "🔍 Filtrar por año":
-    st.subheader("📅 Filtra los K-dramas por año de estreno")
+    st.subheader("📅 Filtrar K-dramas por año de estreno")
     años = sorted(df['year_of_release'].dropna().unique())
     año = st.selectbox("Selecciona un año", años)
     filtrado = df[df['year_of_release'] == año]
     st.success(f"🎬 Se encontraron {len(filtrado)} títulos en {año}.")
     st.dataframe(filtrado[['title', 'genre', 'number_of_episodes']])
+    st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-    # Imagen de ambientación decorativa
-    st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_column_width=False, width=300)
-
-# 🎮 Opción 5: Mini juego interactivo
+# 🎮 Minijuego
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
-    st.subheader("🎲 Adivina el número de episodios... ¿verdadero o falso?")
+    st.subheader("🎲 Adivina si el número de episodios es correcto")
+
+    # Inicializar variables de juego
     if "puntos" not in st.session_state:
         st.session_state.puntos = 0
         st.session_state.ronda = 1
@@ -118,4 +129,4 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         if st.button("Reiniciar juego"):
             st.session_state.puntos = 0
             st.session_state.ronda = 1
-        st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_column_width=False, width=250)
+        st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
