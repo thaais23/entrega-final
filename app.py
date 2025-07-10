@@ -154,13 +154,20 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         st.markdown(f"<h4 style='color:#444;'>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
 
         if st.session_state.drama_actual is None:
-            drama = df[['title', 'number_of_episodes']].dropna().sample(1).iloc[0]
-            alterado = drama['number_of_episodes'] + random.choice([-3, -1, 0, +2, +3])
-            st.session_state.drama_actual = {
-                "titulo": drama['title'],
-                "real": drama['number_of_episodes'],
-                "mostrado": alterado
-            }
+            muestra = df[['title', 'number_of_episodes']].dropna()
+            if not muestra.empty:
+                drama = muestra.sample(1).iloc[0]
+                titulo = str(drama['title'])
+                real = int(drama['number_of_episodes'])
+                mostrado = real + random.choice([-3, -1, 0, +2, +3])
+                st.session_state.drama_actual = {
+                    "titulo": titulo,
+                    "real": real,
+                    "mostrado": mostrado
+                }
+            else:
+                st.error("No hay datos disponibles para el minijuego.")
+                st.stop()
 
         datos = st.session_state.drama_actual
 
