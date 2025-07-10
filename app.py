@@ -178,7 +178,30 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             </div>
         """, unsafe_allow_html=True)
 
-        respuesta = st.radio("Selecciona tu respuesta", ["Verdadero", "Falso"], index=None, horizontal=True, label_visibility="collapsed")
+        # 🖤 Estilo para texto negro en radio
+        st.markdown("""
+            <style>
+                div.row-widget.stRadio > div {
+                    flex-direction: row;
+                }
+                div.row-widget.stRadio label > div {
+                    color: #000000 !important;
+                    font-weight: bold;
+                    background-color: #fce4ec;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    margin: 5px;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
+        respuesta = st.radio(
+            "Selecciona tu respuesta",
+            ["Verdadero", "Falso"],
+            index=None,
+            horizontal=True,
+            label_visibility="collapsed"
+        )
 
         if respuesta:
             if st.button("📩 Confirmar respuesta"):
