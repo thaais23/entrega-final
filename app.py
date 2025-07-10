@@ -6,10 +6,10 @@ from wordcloud import WordCloud
 import random
 from collections import Counter
 
-# 🌼 Configuración general de la app
+# 🌼 Configuración general
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# 🎨 Estilo visual de fondo rosado claro + letras oscuras
+# 🎨 Estilos personalizados
 st.markdown("""
     <style>
         html, body, .stApp {
@@ -22,20 +22,35 @@ st.markdown("""
         .stRadio > div {
             color: #222 !important;
         }
-        .css-18e3th9 {
-            background-color: #fff0f5 !important;
+        /* Sidebar */
+        section[data-testid="stSidebar"] {
+            background-color: #f0f0f0;
+        }
+        /* Selectbox */
+        .stSelectbox div[data-baseweb="select"] {
+            background-color: #fffafc !important;
+            color: #222 !important;
+        }
+        /* Mensaje de éxito */
+        .stAlert.success {
+            background-color: #fce4ec;
+            color: #222;
+        }
+        /* Texto radio buttons */
+        label[data-baseweb="radio"] {
+            color: #333 !important;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# 📚 Cargar el dataset
+# 📚 Cargar dataset
 df = pd.read_csv("kdrama_DATASET.csv")
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
-# 📷 Imagen en sidebar decorativa
+# 📷 Imagen decorativa en el sidebar
 st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_container_width=True)
 
-# 📋 Menú principal
+# 📋 Menú de navegación
 opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🏠 Inicio",
     "📅 Producción por año",
@@ -45,7 +60,7 @@ opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🎮 Mini juego: ¿Verdadero o falso?"
 ])
 
-# 🏠 SECCIÓN DE INICIO
+# 🏠 Página de inicio
 if opcion == "🏠 Inicio":
     st.image("Songjoongkipng.png", use_container_width=True)
     st.markdown("<h1 style='text-align:center;'>Bienvenid@ a tu app de K-dramas ✨</h1>", unsafe_allow_html=True)
@@ -72,17 +87,16 @@ elif opcion == "🎭 Géneros más comunes":
     sns.barplot(
         x=[g[0] for g in conteo.most_common(10)],
         y=[g[1] for g in conteo.most_common(10)],
-        palette="pastel",
-        ax=ax
+        palette="pastel", ax=ax
     )
     ax.set_title("Géneros más frecuentes")
-    ax.set_ylabel("Frecuencia")
     ax.set_xlabel("Género")
+    ax.set_ylabel("Frecuencia")
     st.pyplot(fig)
 
 # ☁️ Nube de palabras
 elif opcion == "☁️ Nube de palabras en títulos":
-    st.subheader("🗣️ Palabras más comunes en los títulos de K-dramas")
+    st.subheader("☁️ Palabras más comunes en los títulos de K-dramas")
     textos = " ".join(df['title'].dropna())
     wc = WordCloud(width=800, height=400, background_color="white", colormap="pink").generate(textos)
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -90,7 +104,7 @@ elif opcion == "☁️ Nube de palabras en títulos":
     ax.axis("off")
     st.pyplot(fig)
 
-# 🔍 Filtro por año
+# 🔍 Filtrar por año
 elif opcion == "🔍 Filtrar por año":
     st.subheader("📅 Filtrar K-dramas por año de estreno")
     años = sorted(df['year_of_release'].dropna().unique())
@@ -103,8 +117,6 @@ elif opcion == "🔍 Filtrar por año":
 # 🎮 Minijuego
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.subheader("🎲 Adivina si el número de episodios es correcto")
-
-    # Inicializar variables de juego
     if "puntos" not in st.session_state:
         st.session_state.puntos = 0
         st.session_state.ronda = 1
