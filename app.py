@@ -29,7 +29,7 @@ st.markdown(
 )
 
 # 📷 Imagen decorativa de entrada
-st.image("Songjoongkipng", use_column_width=True)
+st.image("Songjoongkipng.png", use_column_width=True)
 
 # 🌺 Título
 st.markdown("<h1 style='text-align:center; color:#e91e63;'>Explora el Universo de los K-dramas</h1>", unsafe_allow_html=True)
