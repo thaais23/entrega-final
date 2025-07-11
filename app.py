@@ -8,22 +8,16 @@ from collections import Counter
 
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# Estilos globales
+# Estilos visuales
 st.markdown("""
     <style>
         html, body, .stApp {
             background-color: #fff0f5;
             color: #222;
         }
-
         section[data-testid="stSidebar"] {
             background-color: #dddddd !important;
         }
-
-        h1, h2, h3, h4 {
-            color: #e91e63 !important;
-        }
-
         .stButton>button {
             background-color: #f8bbd0;
             color: #000;
@@ -32,10 +26,13 @@ st.markdown("""
             padding: 0.5em 1em;
             border: none;
         }
+        h1, h2, h3 {
+            color: #e91e63 !important;
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# Cargar dataset
+# Dataset
 df = pd.read_csv("kdrama_DATASET.csv")
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
@@ -113,7 +110,7 @@ elif opcion == "🔍 Filtrar por año":
         st.warning("No se encontraron resultados para este año.")
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# MINI JUEGO COMPLETO Y FUNCIONAL
+# MINI JUEGO FINAL Y ESTABLE
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
 
@@ -125,44 +122,25 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             "respuesta": "",
             "resultado": "",
             "mostrar_pregunta": True,
-            "juego_terminado": False,
-            "siguiente_ronda": False,
-            "reiniciar": False
+            "juego_terminado": False
         }
 
     estado = st.session_state.estado_juego
-
-    if estado["reiniciar"]:
-        st.session_state.estado_juego = {
-            "ronda": 1,
-            "puntos": 0,
-            "drama": None,
-            "respuesta": "",
-            "resultado": "",
-            "mostrar_pregunta": True,
-            "juego_terminado": False,
-            "siguiente_ronda": False,
-            "reiniciar": False
-        }
-        st.experimental_rerun()
-
-    if estado["siguiente_ronda"]:
-        estado["ronda"] += 1
-        if estado["ronda"] > 3:
-            estado["juego_terminado"] = True
-        else:
-            estado["drama"] = None
-            estado["respuesta"] = ""
-            estado["resultado"] = ""
-            estado["mostrar_pregunta"] = True
-        estado["siguiente_ronda"] = False
-        st.experimental_rerun()
 
     if estado["juego_terminado"]:
         st.success(f"🎉 Juego terminado. Tu puntaje fue: {estado['puntos']}/3")
         st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
         if st.button("🔄 Volver a jugar"):
-            estado["reiniciar"] = True
+            st.session_state.estado_juego = {
+                "ronda": 1,
+                "puntos": 0,
+                "drama": None,
+                "respuesta": "",
+                "resultado": "",
+                "mostrar_pregunta": True,
+                "juego_terminado": False
+            }
+            st.experimental_rerun()
         st.stop()
 
     st.markdown(f"<h4 style='color:#444;'>🔹 Ronda {estado['ronda']} de 3</h4>", unsafe_allow_html=True)
@@ -170,10 +148,11 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     if estado["drama"] is None:
         muestra = df[['title', 'number_of_episodes']].dropna()
         elegido = muestra.sample(1).iloc[0]
-        titulo = str(elegido['title'])
-        real = int(elegido['number_of_episodes'])
-        mostrado = real + random.choice([-3, -2, 0, +2, +3])
-        estado["drama"] = {"titulo": titulo, "real": real, "mostrado": mostrado}
+        estado["drama"] = {
+            "titulo": elegido["title"],
+            "real": int(elegido["number_of_episodes"]),
+            "mostrado": int(elegido["number_of_episodes"]) + random.choice([-3, -2, 0, +2, +3])
+        }
 
     drama = estado["drama"]
 
@@ -194,19 +173,20 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
                 estado["respuesta"] = "Falso"
 
         if estado["respuesta"]:
-            correcta = (
-                (estado["respuesta"] == "Verdadero" and drama['mostrado'] == drama['real']) or
-                (estado["respuesta"] == "Falso" and drama['mostrado'] != drama['real'])
+            correcto = (
+                (estado["respuesta"] == "Verdadero" and drama["mostrado"] == drama["real"]) or
+                (estado["respuesta"] == "Falso" and drama["mostrado"] != drama["real"])
             )
-            if correcta:
+            if correcto:
                 estado["resultado"] = f"✅ ¡Correcto! Tiene {drama['real']} episodios."
                 estado["puntos"] += 1
             else:
                 estado["resultado"] = f"❌ Incorrecto. Tiene {drama['real']} episodios."
             estado["mostrar_pregunta"] = False
             st.experimental_rerun()
+        st.stop()
 
-    if not estado["mostrar_pregunta"] and estado["resultado"]:
+    if not estado["mostrar_pregunta"]:
         st.markdown(f"""
             <div style='background-color:#ffe6ef; padding:15px; border-radius:10px; color:#000; font-size:16px;'>
                 {estado["resultado"]}
@@ -214,4 +194,13 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         """, unsafe_allow_html=True)
 
         if st.button("➡️ Siguiente ronda"):
-            estado["siguiente_ronda"] = True
+            estado["ronda"] += 1
+            if estado["ronda"] > 3:
+                estado["juego_terminado"] = True
+            else:
+                estado["drama"] = None
+                estado["respuesta"] = ""
+                estado["resultado"] = ""
+                estado["mostrar_pregunta"] = True
+            st.experimental_rerun()
+        st.stop()
