@@ -8,7 +8,7 @@ from collections import Counter
 
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# Estilo
+# Estilo general
 st.markdown("""
     <style>
         html, body, .stApp {
@@ -116,15 +116,16 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
 
     st.markdown("""
     <div style='
-        background-color:#ffe6ef;
+        background-color:#f8a9c5;
         color:#000;
-        border-left:6px solid #e91e63;
+        border-left:6px solid #b30047;
         padding:15px;
         border-radius:10px;
         margin-top:10px;
         font-size:16px;
+        font-weight:600;
     '>
-    🖱️ <b>Nota:</b> En algunas ocasiones, puede ser necesario hacer doble clic para avanzar a la siguiente ronda.
+    🖱️ <b>Nota importante:</b> A veces es necesario hacer doble clic para pasar a la siguiente ronda. ¡Gracias por tu paciencia! 💖
     </div>
     """, unsafe_allow_html=True)
 
