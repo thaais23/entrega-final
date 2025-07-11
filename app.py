@@ -137,7 +137,21 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         st.session_state.resultado = ""
 
     if st.session_state.ronda > 3:
-        st.success(f"🎉 Juego terminado. Tu puntaje fue: {st.session_state.puntos}/3")
+        st.markdown(f"""
+        <div style='
+            background-color:#f8a9c5;
+            color:#000;
+            border-left:6px solid #b30047;
+            padding:15px;
+            border-radius:10px;
+            margin-top:10px;
+            font-size:18px;
+            font-weight:600;
+        '>
+        🎉 <b>Juego terminado</b><br>
+        Tu puntaje final fue: <b>{st.session_state.puntos}/3</b>
+        </div>
+        """, unsafe_allow_html=True)
         st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
         if st.button("🔁 Volver a jugar"):
             st.session_state.ronda = 1
