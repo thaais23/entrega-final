@@ -119,6 +119,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         st.session_state.puntos = 0
         st.session_state.estado = "pregunta"
         st.session_state.drama = None
+        st.session_state.respuesta = ""
         st.session_state.resultado = ""
 
     if st.session_state.ronda > 3:
@@ -129,6 +130,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             st.session_state.puntos = 0
             st.session_state.estado = "pregunta"
             st.session_state.drama = None
+            st.session_state.respuesta = ""
             st.session_state.resultado = ""
         st.stop()
 
@@ -153,7 +155,6 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             if st.button("❌ Falso"):
                 st.session_state.respuesta = "Falso"
                 st.session_state.estado = "respuesta"
-        st.stop()
 
     if st.session_state.estado == "respuesta":
         drama = st.session_state.drama
