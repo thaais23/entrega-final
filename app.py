@@ -112,6 +112,7 @@ elif opcion == "🔍 Filtrar por año":
 
 # MINI JUEGO FINAL
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
+    st.info("🖱️ Nota: En algunas ocasiones, puede ser necesario hacer doble clic para avanzar a la siguiente ronda.")
     st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
 
     if "ronda" not in st.session_state:
