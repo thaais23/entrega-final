@@ -8,7 +8,7 @@ from collections import Counter
 
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# Estilos visuales
+# Estilo
 st.markdown("""
     <style>
         html, body, .stApp {
@@ -110,82 +110,62 @@ elif opcion == "🔍 Filtrar por año":
         st.warning("No se encontraron resultados para este año.")
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# MINI JUEGO SIN RERUN
+# MINI JUEGO CON FORMULARIOS
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
 
-    if "ronda" not in st.session_state:
-        st.session_state.ronda = 1
-        st.session_state.puntos = 0
-        st.session_state.drama = None
-        st.session_state.respuesta = ""
-        st.session_state.resultado = ""
-        st.session_state.estado = "pregunta"
+    if "juego" not in st.session_state:
+        st.session_state.juego = {
+            "ronda": 1,
+            "puntos": 0,
+            "pregunta_actual": {},
+            "estado": "jugando"
+        }
 
-    if st.session_state.estado == "final":
-        st.success(f"🎉 Juego terminado. Tu puntaje fue: {st.session_state.puntos}/3")
+    juego = st.session_state.juego
+
+    if juego["ronda"] > 3:
+        st.success(f"🎉 Juego terminado. Tu puntaje fue: {juego['puntos']}/3")
         st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
         if st.button("🔄 Volver a jugar"):
-            st.session_state.ronda = 1
-            st.session_state.puntos = 0
-            st.session_state.estado = "pregunta"
-            st.session_state.drama = None
-            st.session_state.resultado = ""
-            st.session_state.respuesta = ""
+            st.session_state.juego = {
+                "ronda": 1,
+                "puntos": 0,
+                "pregunta_actual": {},
+                "estado": "jugando"
+            }
         st.stop()
 
-    st.markdown(f"<h4 style='color:#444;'>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
-
-    if st.session_state.drama is None:
+    # Crear nueva pregunta si no existe
+    if not juego["pregunta_actual"]:
         muestra = df[['title', 'number_of_episodes']].dropna()
         elegido = muestra.sample(1).iloc[0]
-        real = int(elegido['number_of_episodes'])
-        mostrado = real + random.choice([-3, -2, 0, +2, +3])
-        st.session_state.drama = {"titulo": elegido['title'], "real": real, "mostrado": mostrado}
+        real = int(elegido["number_of_episodes"])
+        mostrado = real + random.choice([-3, -2, 0, 2, 3])
+        juego["pregunta_actual"] = {
+            "titulo": elegido["title"],
+            "real": real,
+            "mostrado": mostrado
+        }
 
-    drama = st.session_state.drama
+    pregunta = juego["pregunta_actual"]
+    st.markdown(f"<h4>🔹 Ronda {juego['ronda']} de 3</h4>", unsafe_allow_html=True)
+    st.markdown(f"<b>{pregunta['titulo']}</b> tiene <b>{pregunta['mostrado']}</b> episodios. ¿Verdadero o Falso?", unsafe_allow_html=True)
 
-    if st.session_state.estado == "pregunta":
-        st.markdown(f"""
-            <div style='background-color:#fff3f8; padding:25px; border-radius:12px;'>
-                <p style='font-size:18px; color:#000;'><b>{drama['titulo']}</b> tiene <b>{drama['mostrado']}</b> episodios.</p>
-                <p style='font-size:16px; color:#000;'>¿Crees que eso es <b style='color:#000;'>verdadero</b> o <b style='color:#000;'>falso</b>?</p>
-            </div>
-        """, unsafe_allow_html=True)
+    with st.form(key=f"ronda_{juego['ronda']}"):
+        respuesta = st.radio("Selecciona tu respuesta:", ["Verdadero", "Falso"])
+        submit = st.form_submit_button("Confirmar respuesta")
 
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("✔️ Verdadero"):
-                st.session_state.respuesta = "Verdadero"
-        with col2:
-            if st.button("❌ Falso"):
-                st.session_state.respuesta = "Falso"
-
-        if st.session_state.respuesta:
+        if submit:
             correcta = (
-                (st.session_state.respuesta == "Verdadero" and drama['mostrado'] == drama['real']) or
-                (st.session_state.respuesta == "Falso" and drama['mostrado'] != drama['real'])
+                (respuesta == "Verdadero" and pregunta["mostrado"] == pregunta["real"]) or
+                (respuesta == "Falso" and pregunta["mostrado"] != pregunta["real"])
             )
             if correcta:
-                st.session_state.resultado = f"✅ ¡Correcto! Tiene {drama['real']} episodios."
-                st.session_state.puntos += 1
+                st.success(f"✅ ¡Correcto! Tiene {pregunta['real']} episodios.")
+                juego["puntos"] += 1
             else:
-                st.session_state.resultado = f"❌ Incorrecto. Tiene {drama['real']} episodios."
-            st.session_state.estado = "respuesta"
+                st.error(f"❌ Incorrecto. Tiene {pregunta['real']} episodios.")
 
-    elif st.session_state.estado == "respuesta":
-        st.markdown(f"""
-            <div style='background-color:#ffe6ef; padding:15px; border-radius:10px; color:#000; font-size:16px;'>
-                {st.session_state.resultado}
-            </div>
-        """, unsafe_allow_html=True)
-
-        if st.button("➡️ Siguiente ronda"):
-            st.session_state.ronda += 1
-            if st.session_state.ronda > 3:
-                st.session_state.estado = "final"
-            else:
-                st.session_state.drama = None
-                st.session_state.respuesta = ""
-                st.session_state.resultado = ""
-                st.session_state.estado = "pregunta"
+            juego["ronda"] += 1
+            juego["pregunta_actual"] = {}
