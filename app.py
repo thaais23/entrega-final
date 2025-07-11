@@ -16,7 +16,7 @@ st.markdown("""
             color: #222;
         }
         section[data-testid="stSidebar"] {
-            background-color: #dddddd !important;
+            background-color: #bbb !important;
         }
         .stButton>button {
             background-color: #f8bbd0;
