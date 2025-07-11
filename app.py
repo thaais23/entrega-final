@@ -121,6 +121,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         st.session_state.drama = None
         st.session_state.respuesta = ""
         st.session_state.resultado = ""
+        st.session_state.mostrar_resultado = False
 
     if st.session_state.ronda > 3:
         st.success(f"🎉 Juego terminado. Tu puntaje fue: {st.session_state.puntos}/3")
@@ -132,6 +133,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             st.session_state.drama = None
             st.session_state.respuesta = ""
             st.session_state.resultado = ""
+            st.session_state.mostrar_resultado = False
         st.stop()
 
     st.markdown(f"<h4>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
@@ -151,12 +153,14 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             if st.button("✔️ Verdadero"):
                 st.session_state.respuesta = "Verdadero"
                 st.session_state.estado = "respuesta"
+                st.session_state.mostrar_resultado = True
         with col2:
             if st.button("❌ Falso"):
                 st.session_state.respuesta = "Falso"
                 st.session_state.estado = "respuesta"
+                st.session_state.mostrar_resultado = True
 
-    if st.session_state.estado == "respuesta":
+    if st.session_state.estado == "respuesta" and st.session_state.mostrar_resultado:
         drama = st.session_state.drama
         correcta = (
             (st.session_state.respuesta == "Verdadero" and drama["mostrado"] == drama["real"]) or
@@ -180,3 +184,4 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             st.session_state.drama = None
             st.session_state.respuesta = ""
             st.session_state.resultado = ""
+            st.session_state.mostrar_resultado = False
