@@ -8,7 +8,7 @@ from collections import Counter
 
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# Estilo
+# Estilos
 st.markdown("""
     <style>
         html, body, .stApp {
@@ -110,78 +110,79 @@ elif opcion == "🔍 Filtrar por año":
         st.warning("No se encontraron resultados para este año.")
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# MINI JUEGO FINAL
+# MINI JUEGO
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
     st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
 
-    if "ronda" not in st.session_state:
-        st.session_state.ronda = 1
-        st.session_state.puntos = 0
-        st.session_state.estado = "pregunta"
-        st.session_state.drama = None
-        st.session_state.respuesta = ""
-        st.session_state.resultado = ""
-        st.session_state.mostrar_resultado = False
+    if "juego_estado" not in st.session_state:
+        st.session_state.juego_estado = {
+            "ronda": 1,
+            "puntos": 0,
+            "titulo": "",
+            "real": 0,
+            "mostrado": 0,
+            "fase": "pregunta",
+            "respuesta_usuario": "",
+            "resultado": ""
+        }
 
-    if st.session_state.ronda > 3:
-        st.success(f"🎉 Juego terminado. Tu puntaje fue: {st.session_state.puntos}/3")
+    juego = st.session_state.juego_estado
+
+    if juego["ronda"] > 3:
+        st.success(f"🎉 Juego terminado. Tu puntaje fue: {juego['puntos']}/3")
         st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
         if st.button("🔁 Volver a jugar"):
-            st.session_state.ronda = 1
-            st.session_state.puntos = 0
-            st.session_state.estado = "pregunta"
-            st.session_state.drama = None
-            st.session_state.respuesta = ""
-            st.session_state.resultado = ""
-            st.session_state.mostrar_resultado = False
+            st.session_state.juego_estado = {
+                "ronda": 1,
+                "puntos": 0,
+                "titulo": "",
+                "real": 0,
+                "mostrado": 0,
+                "fase": "pregunta",
+                "respuesta_usuario": "",
+                "resultado": ""
+            }
         st.stop()
 
-    st.markdown(f"<h4>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
+    st.markdown(f"<h4>🔹 Ronda {juego['ronda']} de 3</h4>", unsafe_allow_html=True)
 
-    if st.session_state.estado == "pregunta":
-        if st.session_state.drama is None:
-            muestra = df[['title', 'number_of_episodes']].dropna()
-            elegido = muestra.sample(1).iloc[0]
-            real = int(elegido["number_of_episodes"])
-            mostrado = real + random.choice([-3, -2, 0, 2, 3])
-            st.session_state.drama = {"titulo": elegido["title"], "real": real, "mostrado": mostrado}
+    if juego["fase"] == "pregunta":
+        muestra = df[['title', 'number_of_episodes']].dropna()
+        elegido = muestra.sample(1).iloc[0]
+        juego["titulo"] = elegido["title"]
+        juego["real"] = int(elegido["number_of_episodes"])
+        juego["mostrado"] = juego["real"] + random.choice([-3, -2, 0, 2, 3])
+        juego["fase"] = "respuesta"
 
-        drama = st.session_state.drama
-        st.markdown(f"<b>{drama['titulo']}</b> tiene <b>{drama['mostrado']}</b> episodios. ¿Verdadero o Falso?", unsafe_allow_html=True)
+    if juego["fase"] == "respuesta":
+        st.markdown(f"<b>{juego['titulo']}</b> tiene <b>{juego['mostrado']}</b> episodios. ¿Verdadero o Falso?", unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         with col1:
             if st.button("✔️ Verdadero"):
-                st.session_state.respuesta = "Verdadero"
-                st.session_state.estado = "respuesta"
-                st.session_state.mostrar_resultado = True
+                juego["respuesta_usuario"] = "Verdadero"
+                juego["fase"] = "veredicto"
         with col2:
             if st.button("❌ Falso"):
-                st.session_state.respuesta = "Falso"
-                st.session_state.estado = "respuesta"
-                st.session_state.mostrar_resultado = True
+                juego["respuesta_usuario"] = "Falso"
+                juego["fase"] = "veredicto"
 
-    if st.session_state.estado == "respuesta" and st.session_state.mostrar_resultado:
-        drama = st.session_state.drama
-        correcta = (
-            (st.session_state.respuesta == "Verdadero" and drama["mostrado"] == drama["real"]) or
-            (st.session_state.respuesta == "Falso" and drama["mostrado"] != drama["real"])
+    if juego["fase"] == "veredicto":
+        correcto = (
+            (juego["respuesta_usuario"] == "Verdadero" and juego["mostrado"] == juego["real"]) or
+            (juego["respuesta_usuario"] == "Falso" and juego["mostrado"] != juego["real"])
         )
-        if correcta:
-            st.session_state.resultado = f"✅ ¡Correcto! Tiene {drama['real']} episodios."
-            st.session_state.puntos += 1
+        if correcto:
+            juego["resultado"] = f"✅ ¡Correcto! Tiene {juego['real']} episodios."
+            juego["puntos"] += 1
         else:
-            st.session_state.resultado = f"❌ Incorrecto. Tiene {drama['real']} episodios."
+            juego["resultado"] = f"❌ Incorrecto. Tiene {juego['real']} episodios."
 
         st.markdown(f"""
             <div style='background-color:#ffe6ef; padding:15px; border-radius:10px; color:#000; font-size:16px;'>
-                {st.session_state.resultado}
+                {juego['resultado']}
             </div>
         """, unsafe_allow_html=True)
 
         if st.button("➡️ Siguiente ronda"):
-            st.session_state.ronda += 1
-            st.session_state.estado = "pregunta"
-            st.session_state.drama = None
-            st.session_state.respuesta = ""
-            st.session_state.resultado = ""
-            st.session_state.mostrar_resultado = False
+            juego["ronda"] += 1
+            juego["fase"] = "pregunta"
