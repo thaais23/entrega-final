@@ -1,3 +1,4 @@
+# 💻 Librerías necesarias para la app
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,9 +7,10 @@ from wordcloud import WordCloud
 import random
 from collections import Counter
 
+# 🛠️ Configuración general de la app
 st.set_page_config(page_title="Explora el Universo de los K-dramas", layout="wide")
 
-# Estilo general
+# 🎨 Estilo visual con HTML y CSS incrustado
 st.markdown("""
     <style>
         html, body, .stApp {
@@ -16,7 +18,7 @@ st.markdown("""
             color: #222;
         }
         section[data-testid="stSidebar"] {
-            background-color: #bbb !important;
+            background-color: #cccccc !important; /* Color plomo claro */
         }
         .stButton>button {
             background-color: #f8bbd0;
@@ -32,11 +34,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Dataset
+# 📂 Carga del dataset
 df = pd.read_csv("kdrama_DATASET.csv")
 df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
-# Sidebar
+# 📌 Barra lateral con menú de navegación
 st.sidebar.image("Nevertheless.jpg", caption="✨ K-drama vibes", use_container_width=True)
 opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🏠 Inicio",
@@ -47,13 +49,13 @@ opcion = st.sidebar.radio("📌 Elige qué explorar:", [
     "🎮 Mini juego: ¿Verdadero o falso?"
 ])
 
-# INICIO
+# 🏠 Página de inicio
 if opcion == "🏠 Inicio":
     st.image("Songjoongkipng.png", use_container_width=True)
     st.markdown("<h1 style='text-align:center;'>Bienvenid@ a tu app de K-dramas ✨</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center;'>Analiza, explora y diviértete con los mejores títulos coreanos 💕</p>", unsafe_allow_html=True)
 
-# PRODUCCIÓN POR AÑO
+# 📅 Producción por año
 elif opcion == "📅 Producción por año":
     st.subheader("📈 Cantidad de K-dramas producidos por año")
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -61,7 +63,7 @@ elif opcion == "📅 Producción por año":
     plt.xticks(rotation=45)
     st.pyplot(fig)
 
-# GÉNEROS
+# 🎭 Géneros más comunes
 elif opcion == "🎭 Géneros más comunes":
     st.subheader("🎬 Top 10 géneros más frecuentes en K-dramas")
     generos = df['genre'].dropna().str.split(", ")
@@ -78,7 +80,7 @@ elif opcion == "🎭 Géneros más comunes":
     ax.set_ylabel("Frecuencia")
     st.pyplot(fig)
 
-# NUBE DE PALABRAS
+# ☁️ Nube de palabras en títulos
 elif opcion == "☁️ Nube de palabras en títulos":
     st.subheader("☁️ Palabras más comunes en los títulos de K-dramas")
     textos = " ".join(df['title'].dropna())
@@ -88,16 +90,18 @@ elif opcion == "☁️ Nube de palabras en títulos":
     ax.axis("off")
     st.pyplot(fig)
 
-# FILTRAR POR AÑO
+# 🔍 Filtrar por año
 elif opcion == "🔍 Filtrar por año":
     st.subheader("📅 Busca K-dramas por año de estreno")
     años = sorted(df['year_of_release'].dropna().unique())
     año = st.slider("Selecciona el año", int(min(años)), int(max(años)), int(max(años)))
     filtrado = df[df['year_of_release'] == año]
+
     st.markdown(
         f"<div style='background-color:#ffeef5; padding:15px; border-radius:10px; color:#111; font-weight:600;'>🎬 En {año} se estrenaron <b>{len(filtrado)}</b> títulos.</div>",
         unsafe_allow_html=True
     )
+
     if not filtrado.empty:
         for index, row in filtrado.iterrows():
             st.markdown(f"""
@@ -108,27 +112,15 @@ elif opcion == "🔍 Filtrar por año":
             """, unsafe_allow_html=True)
     else:
         st.warning("No se encontraron resultados para este año.")
+
     st.image("Lovenextdoor.jpg", caption="Una escena de K-drama", use_container_width=True)
 
-# MINI JUEGO FINAL
+# 🎮 Minijuego: Verdadero o falso
 elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
+    st.info("🖱️ Nota: En algunas ocasiones, puede ser necesario hacer doble clic para avanzar a la siguiente ronda.")
     st.markdown("<h2 style='color:#e91e63;'>🎲 Mini juego: ¿Verdadero o falso?</h2>", unsafe_allow_html=True)
 
-    st.markdown("""
-    <div style='
-        background-color:#f8a9c5;
-        color:#000;
-        border-left:6px solid #b30047;
-        padding:15px;
-        border-radius:10px;
-        margin-top:10px;
-        font-size:16px;
-        font-weight:600;
-    '>
-    🖱️ <b>Nota importante:</b> A veces es necesario hacer doble clic para pasar a la siguiente ronda. ¡Gracias por tu paciencia! 💖
-    </div>
-    """, unsafe_allow_html=True)
-
+    # Variables de sesión para manejar el juego
     if "ronda" not in st.session_state:
         st.session_state.ronda = 1
         st.session_state.puntos = 0
@@ -136,22 +128,9 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
         st.session_state.drama = None
         st.session_state.resultado = ""
 
+    # Mensaje final cuando termina el juego
     if st.session_state.ronda > 3:
-        st.markdown(f"""
-        <div style='
-            background-color:#f8a9c5;
-            color:#000;
-            border-left:6px solid #b30047;
-            padding:15px;
-            border-radius:10px;
-            margin-top:10px;
-            font-size:18px;
-            font-weight:600;
-        '>
-        🎉 <b>Juego terminado</b><br>
-        Tu puntaje final fue: <b>{st.session_state.puntos}/3</b>
-        </div>
-        """, unsafe_allow_html=True)
+        st.success(f"🎉 Juego terminado. Tu puntaje fue: {st.session_state.puntos}/3")
         st.image("Collagecuadrado.jpg", caption="¡Gracias por jugar!", use_container_width=True)
         if st.button("🔁 Volver a jugar"):
             st.session_state.ronda = 1
@@ -161,6 +140,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
             st.session_state.resultado = ""
         st.stop()
 
+    # Pregunta de la ronda actual
     st.markdown(f"<h4>🔹 Ronda {st.session_state.ronda} de 3</h4>", unsafe_allow_html=True)
 
     if st.session_state.estado == "pregunta":
@@ -173,6 +153,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
 
         drama = st.session_state.drama
         st.markdown(f"<b>{drama['titulo']}</b> tiene <b>{drama['mostrado']}</b> episodios. ¿Verdadero o Falso?", unsafe_allow_html=True)
+
         col1, col2 = st.columns(2)
         with col1:
             if st.button("✔️ Verdadero"):
@@ -184,6 +165,7 @@ elif opcion == "🎮 Mini juego: ¿Verdadero o falso?":
                 st.session_state.estado = "respuesta"
         st.stop()
 
+    # Mostrar si acertó o no
     if st.session_state.estado == "respuesta":
         drama = st.session_state.drama
         correcta = (
